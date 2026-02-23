@@ -32,14 +32,12 @@ st.markdown("""
         font-weight: bold !important;
     }
 
-    /* --- THE ULTIMATE BUTTON FIX --- */
-    /* This forces the parent containers to stop squishing the buttons */
+    /* THE ULTIMATE BUTTON FIX */
     [data-testid="column"], [data-testid="stVerticalBlock"] > div {
         width: 100% !important;
         flex: 1 1 100% !important;
     }
 
-    /* This forces the button itself to fill the newly widened container */
     .stButton, .stButton > button {
         width: 100% !important;
         display: block !important;
@@ -66,7 +64,7 @@ st.markdown("""
         margin-top: 15px !important;
     }
 
-    /* DESTROY BUTTON - Slightly smaller but still full width */
+    /* DESTROY BUTTON */
     div[data-testid="stVerticalBlock"] > div:last-child .stButton > button p {
         font-size: 24px !important;
     }
@@ -112,9 +110,8 @@ coord_to_char = {v: k for k, v in char_to_coord.items()}
 EMOJI_MAP = {'1': '🦄', '2': '🍼', '3': '🩷', '4': '🧸', '5': '🎀', '6': '🍓', '7': '🌈', '8': '🌸', '9': '💕', '0': '🫐'}
 
 def get_matrix_elements(key_string):
-    """The 'Pro' Key Derivation with a Secret Pepper"""
     salt = b"sweet_parity_salt_v2" 
-    combined_input = key_string + PEPPER #
+    combined_input = key_string + PEPPER 
     kdf = PBKDF2HMAC(
         algorithm=hashes.SHA256(),
         length=4, 
@@ -122,7 +119,7 @@ def get_matrix_elements(key_string):
         iterations=100000, 
         backend=default_backend()
     )
-    key_bytes = kdf.derive(combined_input.encode()) #
+    key_bytes = kdf.derive(combined_input.encode()) 
     a, b, c, d = list(key_bytes)
     return (a % 10 + 2, b % 7 + 1, c % 5 + 1, d % 13 + 2)
 
@@ -144,18 +141,18 @@ def clear_everything():
     st.session_state.hint = ""
 
 # --- 3. UI LAYOUT ---
-if os.path.exists("CYPHER.png"): st.image("CYPHER.png", use_container_width=True)
-if os.path.exists("Lock Lips.png"): st.image("Lock Lips.png", use_container_width=True)
+# REPLACED use_container_width=True WITH width="stretch" TO FIX DEPRECATION
+if os.path.exists("CYPHER.png"): st.image("CYPHER.png", width="stretch")
+if os.path.exists("Lock Lips.png"): st.image("Lock Lips.png", width="stretch")
 
 kw = st.text_input("Key", type="password", key="lips", placeholder="SECRET KEY").upper().strip()
 hint_text = st.text_input("Hint", key="hint", placeholder="KEY HINT (Optional)")
 
-if os.path.exists("Kiss Chemistry.png"): st.image("Kiss Chemistry.png", use_container_width=True)
+if os.path.exists("Kiss Chemistry.png"): st.image("Kiss Chemistry.png", width="stretch")
 user_input = st.text_area("Message", height=120, key="chem", placeholder="YOUR MESSAGE")
 
 output_placeholder = st.empty()
 
-# The logic buttons - Ensure no columns are used here
 kiss_btn = st.button("KISS")
 tell_btn = st.button("TELL")
 
@@ -163,7 +160,7 @@ st.button("DESTROY CHEMISTRY", on_click=clear_everything)
 
 # --- 4. PROCESSING ---
 if kw and (kiss_btn or tell_btn):
-    a, b, c, d = get_matrix_elements(kw) #
+    a, b, c, d = get_matrix_elements(kw)
     det_inv = modInverse((a * d - b * c) % 31)
     
     if det_inv:
@@ -224,4 +221,3 @@ if kw and (kiss_btn or tell_btn):
                 output_placeholder.markdown(f'<div class="whisper-text">Cypher Whispers: {"".join(decoded)}</div>', unsafe_allow_html=True)
             except:
                 st.error("Chemistry Error!")
-
