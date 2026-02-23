@@ -32,9 +32,15 @@ st.markdown("""
         font-weight: bold !important;
     }
 
-    /* THE BOLD MOBILE BUTTONS */
+    /* THE BOLD MOBILE BUTTONS - ULTRA WIDE EDITION */
+    /* This targets the container to ensure it stays full width */
+    div[data-testid="stVerticalBlock"] div[data-testid="element-container"] .stButton,
+    div[data-testid="stVerticalBlock"] div[data-testid="element-container"] .stButton button {
+        width: 100% !important;
+    }
+
     div.stButton > button p {
-        font-size: 36px !important; 
+        font-size: 38px !important; 
         font-weight: 800 !important;
         line-height: 1.1 !important;
         margin: 0 !important;
@@ -44,25 +50,25 @@ st.markdown("""
         background-color: #B4A7D6 !important; 
         color: #FFD4E5 !important;
         border-radius: 15px !important;
-        min-height: 90px !important; 
+        min-height: 100px !important; 
         height: auto !important;     
         border: none !important;
-        width: 100% !important; /* Forces full width on mobile */
         text-transform: uppercase;
         display: flex !important;
         align-items: center !important;
         justify-content: center !important;
-        box-shadow: 0px 4px 10px rgba(0,0,0,0.1);
-        margin-bottom: 12px !important;
+        box-shadow: 0px 4px 12px rgba(0,0,0,0.15);
+        margin-top: 10px !important;
     }
 
-    /* DESTROY BUTTON - Slightly smaller text */
+    /* DESTROY BUTTON - Slightly smaller font but still huge */
     div[data-testid="stVerticalBlock"] > div:last-child .stButton > button p {
-        font-size: 22px !important;
+        font-size: 24px !important;
     }
+    
     div[data-testid="stVerticalBlock"] > div:last-child .stButton > button {
-        min-height: 60px !important;
-        background-color: #D1C4E9 !important; /* Slightly different shade */
+        min-height: 70px !important;
+        background-color: #D1C4E9 !important;
     }
 
     .result-box {
@@ -73,7 +79,7 @@ st.markdown("""
         font-family: "Courier New", Courier, monospace !important;
         border: 2px solid #B4A7D6;
         word-wrap: break-word;
-        margin-top: 10px;
+        margin-top: 15px;
         font-weight: bold;
     }
 
@@ -82,9 +88,9 @@ st.markdown("""
         font-family: "Courier New", Courier, monospace !important;
         font-weight: bold;
         font-size: 26px;
-        margin-top: 15px;
+        margin-top: 20px;
         border-top: 2px dashed #B4A7D6;
-        padding-top: 10px;
+        padding-top: 15px;
     }
     </style>
     """, unsafe_allow_html=True)
@@ -143,7 +149,7 @@ user_input = st.text_area("Message", height=120, key="chem", placeholder="YOUR M
 
 output_placeholder = st.empty()
 
-# Stacked Buttons for Mobile Clarity
+# Stacked Buttons for Mobile
 kiss_btn = st.button("KISS")
 tell_btn = st.button("TELL")
 
