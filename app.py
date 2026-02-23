@@ -17,7 +17,7 @@ st.markdown("""
     <style>
     .stApp { background-color: #E6E1F2 !important; }
     
-    /* Hide default Streamlit labels for a cleaner look */
+    /* Hide default Streamlit labels */
     div[data-testid="stWidgetLabel"], label { display: none !important; }
 
     /* INPUT BOX CUSTOMIZATION */
@@ -32,11 +32,17 @@ st.markdown("""
         font-weight: bold !important;
     }
 
-    /* THE POWER FIX: Forces button containers to be full width on mobile */
-    div[data-testid="stVerticalBlock"] div[data-testid="element-container"],
-    div[data-testid="stVerticalBlock"] div[data-testid="element-container"] .stButton,
-    div[data-testid="stVerticalBlock"] div[data-testid="element-container"] .stButton button {
+    /* --- THE ULTIMATE BUTTON FIX --- */
+    /* This forces the parent containers to stop squishing the buttons */
+    [data-testid="column"], [data-testid="stVerticalBlock"] > div {
         width: 100% !important;
+        flex: 1 1 100% !important;
+    }
+
+    /* This forces the button itself to fill the newly widened container */
+    .stButton, .stButton > button {
+        width: 100% !important;
+        display: block !important;
     }
 
     div.stButton > button p {
@@ -44,6 +50,8 @@ st.markdown("""
         font-weight: 800 !important;
         line-height: 1.1 !important;
         margin: 0 !important;
+        text-align: center !important;
+        width: 100% !important;
     }
 
     div.stButton > button {
@@ -54,14 +62,11 @@ st.markdown("""
         height: auto !important;     
         border: none !important;
         text-transform: uppercase;
-        display: flex !important;
-        align-items: center !important;
-        justify-content: center !important;
         box-shadow: 0px 4px 12px rgba(0,0,0,0.15);
-        margin-top: 10px !important;
+        margin-top: 15px !important;
     }
 
-    /* DESTROY BUTTON - Slightly smaller font but still full width */
+    /* DESTROY BUTTON - Slightly smaller but still full width */
     div[data-testid="stVerticalBlock"] > div:last-child .stButton > button p {
         font-size: 24px !important;
     }
@@ -150,7 +155,7 @@ user_input = st.text_area("Message", height=120, key="chem", placeholder="YOUR M
 
 output_placeholder = st.empty()
 
-# Stacked Buttons (now targeted by our new power CSS fix)
+# The logic buttons - Ensure no columns are used here
 kiss_btn = st.button("KISS")
 tell_btn = st.button("TELL")
 
@@ -219,3 +224,4 @@ if kw and (kiss_btn or tell_btn):
                 output_placeholder.markdown(f'<div class="whisper-text">Cypher Whispers: {"".join(decoded)}</div>', unsafe_allow_html=True)
             except:
                 st.error("Chemistry Error!")
+
