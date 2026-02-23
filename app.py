@@ -2,9 +2,13 @@ import streamlit as st
 import re
 import os
 import streamlit.components.v1 as components
+import hashlib
+from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
+from cryptography.hazmat.primitives import hashes
+from cryptography.hazmat.backends import default_backend
 
 # --- 1. CONFIG & STYLING ---
-st.set_page_config(page_title="Cyfer's Secret Love Language", layout="centered")
+st.set_page_config(page_title="Cyfer Pro: Secret Language", layout="centered")
 
 st.markdown("""
     <style>
@@ -23,9 +27,9 @@ st.markdown("""
         font-weight: bold !important;
     }
 
-    /* THE "GOLDILOCKS" BUTTONS */
+    /* THE "GOLDILOCKS" BUTTONS - Adjusted for Mobile fit */
     div.stButton > button p {
-        font-size: 55px !important;
+        font-size: 42px !important;
         font-weight: 800 !important;
         line-height: 1.1 !important;
         margin: 0 !important;
@@ -35,7 +39,7 @@ st.markdown("""
         background-color: #B4A7D6 !important; 
         color: #FFD4E5 !important;
         border-radius: 15px !important;
-        min-height: 110px !important; 
+        min-height: 90px !important; 
         height: auto !important;     
         border: none !important;
         width: 100% !important;
@@ -48,10 +52,10 @@ st.markdown("""
 
     /* DESTROY BUTTON */
     div[data-testid="stVerticalBlock"] > div:last-child .stButton > button p {
-        font-size: 22px !important;
+        font-size: 20px !important;
     }
     div[data-testid="stVerticalBlock"] > div:last-child .stButton > button {
-        min-height: 60px !important;
+        min-height: 50px !important;
     }
 
     .result-box {
@@ -70,7 +74,7 @@ st.markdown("""
         color: #B4A7D6;
         font-family: "Courier New", Courier, monospace !important;
         font-weight: bold;
-        font-size: 28px;
+        font-size: 26px;
         margin-top: 15px;
         border-top: 2px dashed #B4A7D6;
         padding-top: 10px;
@@ -78,7 +82,7 @@ st.markdown("""
     </style>
     """, unsafe_allow_html=True)
 
-# --- 2. MATH & EMOJI ENGINE ---
+# --- 2. THE PRO ENGINE ---
 char_to_coord = {
     'Q': (2, 25), 'W': (5, 25), 'E': (8, 25), 'R': (11, 25), 'T': (14, 25), 'Y': (17, 25), 'U': (20, 25), 'I': (23, 25), 'O': (26, 25), 'P': (29, 25),
     'A': (3, 20), 'S': (6, 20), 'D': (9, 20), 'F': (12, 20), 'G': (15, 20), 'H': (18, 20), 'J': (21, 20), 'K': (24, 20), 'L': (27, 20),
@@ -89,16 +93,26 @@ char_to_coord = {
 coord_to_char = {v: k for k, v in char_to_coord.items()}
 EMOJI_MAP = {'1': '🦄', '2': '🍼', '3': '🩷', '4': '🧸', '5': '🎀', '6': '🍓', '7': '🌈', '8': '🌸', '9': '💕', '0': '🫐'}
 
+def get_matrix_elements(key_string):
+    """The 'Pro' Key Derivation Function (PBKDF2)"""
+    salt = b"sweet_parity_salt_v2" 
+    kdf = PBKDF2HMAC(
+        algorithm=hashes.SHA256(),
+        length=4, 
+        salt=salt,
+        iterations=100000, 
+        backend=default_backend()
+    )
+    key_bytes = kdf.derive(key_string.encode())
+    a, b, c, d = list(key_bytes)
+    return (a % 10 + 2, b % 7 + 1, c % 5 + 1, d % 13 + 2)
+
 def apply_sweet_parity(val_str):
     def replacer(match):
         digit = match.group(2)
         candy = '🍭' if int(digit) % 2 == 0 else '🍬'
         return candy + digit
     return re.sub(r'(-)(\d)', replacer, val_str)
-
-def get_matrix_elements(key):
-    seed = sum(ord(c) for c in key)
-    return (seed % 7 + 2, seed % 5 + 1, seed % 3 + 1, seed % 11 + 2)
 
 def modInverse(n, m=31):
     for x in range(1, m):
@@ -110,7 +124,7 @@ def clear_everything():
     st.session_state.chem = ""
     st.session_state.hint = ""
 
-# --- 3. UI LAYOUT (RESTORED) ---
+# --- 3. UI LAYOUT ---
 if os.path.exists("CYPHER.png"): st.image("CYPHER.png", width="stretch")
 if os.path.exists("Lock Lips.png"): st.image("Lock Lips.png", width="stretch")
 
@@ -123,14 +137,12 @@ user_input = st.text_area("Message", height=120, key="chem", placeholder="YOUR M
 output_placeholder = st.empty()
 
 col1, col2 = st.columns(2)
-with col1:
-    kiss_btn = st.button("KISS", width="stretch")
-with col2:
-    tell_btn = st.button("TELL", width="stretch")
+with col1: kiss_btn = st.button("KISS", width="stretch")
+with col2: tell_btn = st.button("TELL", width="stretch")
 
 st.button("DESTROY CHEMISTRY", width="stretch", on_click=clear_everything)
 
-# --- 4. PROCESSING LOGIC (ADVANCED) ---
+# --- 4. PROCESSING ---
 if kw and (kiss_btn or tell_btn):
     a, b, c, d = get_matrix_elements(kw)
     det_inv = modInverse((a * d - b * c) % 31)
@@ -143,64 +155,52 @@ if kw and (kiss_btn or tell_btn):
                     x, y = char_to_coord[char]
                     nx, ny = (a*x + b*y) % 31, (c*x + d*y) % 31
                     points.append((nx, ny))
-            
             if points:
-                # 1. Header (Index 0) -> Reverse
-                h_x = "".join(EMOJI_MAP.get(c, c) for c in apply_sweet_parity(str(points[0][0])))
-                h_y = "".join(EMOJI_MAP.get(c, c) for c in apply_sweet_parity(str(points[0][1])))
-                header = f"{h_x[::-1]},{h_y[::-1]}"
+                # Header (Always Reversed)
+                hx = "".join(EMOJI_MAP.get(c, c) for c in apply_sweet_parity(str(points[0][0])))
+                hy = "".join(EMOJI_MAP.get(c, c) for c in apply_sweet_parity(str(points[0][1])))
+                header = f"{hx[::-1]},{hy[::-1]}"
                 
-                # 2. Moves
-                moves_list = []
+                # Moves with Mirror Rhythm
+                m_list = []
                 for i in range(len(points)-1):
-                    dx_v = points[i+1][0] - points[i][0]
-                    dy_v = points[i+1][1] - points[i][1]
-                    
+                    dx_v, dy_v = points[i+1][0]-points[i][0], points[i+1][1]-points[i][1]
                     dx = "".join(EMOJI_MAP.get(c, c) for c in apply_sweet_parity(str(dx_v)))
                     dy = "".join(EMOJI_MAP.get(c, c) for c in apply_sweet_parity(str(dy_v)))
                     
-                    # Mirror Rule: Every second move reversed
-                    if (i + 1) % 2 == 0:
-                        moves_list.append(f"({dx[::-1]},{dy[::-1]})")
-                    else:
-                        moves_list.append(f"({dx},{dy})")
+                    if (i + 1) % 2 == 0: m_list.append(f"({dx[::-1]},{dy[::-1]})")
+                    else: m_list.append(f"({dx},{dy})")
                 
-                emoji_res = f"{header} | MOVES: {' '.join(moves_list)}"
+                res = f"{header} | MOVES: {' '.join(m_list)}"
                 with output_placeholder.container():
-                    st.markdown(f'<div class="result-box">{emoji_res}</div>', unsafe_allow_html=True)
-                    if hint_text: st.caption(f"Hint: {hint_text}")
-                    share_html = f"""<button onclick="navigator.share({{title:'Secret',text:`{emoji_res}\\n\\nHint: {hint_text}`}})" style="background-color:#B4A7D6; color:#FFD4E5; font-weight:bold; border-radius:20px; min-height:80px; width:100%; cursor:pointer; font-size: 32px; border:none; text-transform:uppercase;">SHARE OPTIONS ✨</button>"""
+                    st.markdown(f'<div class="result-box">{res}</div>', unsafe_allow_html=True)
+                    share_html = f"""<button onclick="navigator.share({{title:'Secret',text:`{res}\\n\\nHint: {hint_text}`}})" style="background-color:#B4A7D6; color:#FFD4E5; font-weight:bold; border-radius:20px; min-height:80px; width:100%; cursor:pointer; font-size: 28px; border:none; text-transform:uppercase;">SHARE ✨</button>"""
                     components.html(share_html, height=100)
 
         if tell_btn:
             try:
-                clean_input = user_input.split("Hint:")[0].strip()
-                header_part, moves_part = clean_input.split("|")
+                clean_in = user_input.split("Hint:")[0].strip()
+                h_part, m_part = clean_in.split("|")
                 rev_map = {v: k for k, v in EMOJI_MAP.items()}
                 
-                def emoji_to_math(s):
+                def e_to_m(s):
                     s = "".join(rev_map.get(c, c) for c in s)
                     return int(s.replace('🍭', '-').replace('🍬', '-'))
 
-                # Decode Header (Always Reversed)
-                hx_e, hy_e = header_part.strip().split(",")
-                curr_x, curr_y = emoji_to_math(hx_e[::-1]), emoji_to_math(hy_e[::-1])
+                hx_e, hy_e = h_part.strip().split(",")
+                curr_x, curr_y = e_to_m(hx_e[::-1]), e_to_m(hy_e[::-1])
                 
                 inv_a, inv_b = (d * det_inv) % 31, (-b * det_inv) % 31
                 inv_c, inv_d = (-c * det_inv) % 31, (a * det_inv) % 31
                 ux, uy = (inv_a * curr_x + inv_b * curr_y) % 31, (inv_c * curr_x + inv_d * curr_y) % 31
                 decoded = [coord_to_char.get((ux, uy), "?")]
                 
-                # Decode Moves
-                moves = re.findall(r"\(([^)]+)\)", moves_part)
+                moves = re.findall(r"\(([^)]+)\)", m_part)
                 for i, m in enumerate(moves):
                     dx_e, dy_e = m.split(",")
-                    if (i + 1) % 2 == 0:
-                        dx, dy = emoji_to_math(dx_e[::-1]), emoji_to_math(dy_e[::-1])
-                    else:
-                        dx, dy = emoji_to_math(dx_e), emoji_to_math(dy_e)
-                    curr_x += dx
-                    curr_y += dy
+                    if (i + 1) % 2 == 0: dx, dy = e_to_m(dx_e[::-1]), e_to_m(dy_e[::-1])
+                    else: dx, dy = e_to_m(dx_e), e_to_m(dy_e)
+                    curr_x, curr_y = curr_x + dx, curr_y + dy
                     ux, uy = (inv_a * curr_x + inv_b * curr_y) % 31, (inv_c * curr_x + inv_d * curr_y) % 31
                     decoded.append(coord_to_char.get((ux, uy), "?"))
                 
