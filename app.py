@@ -11,12 +11,13 @@ from cryptography.hazmat.backends import default_backend
 st.set_page_config(page_title="Cyfer Pro: Secret Language", layout="centered")
 
 # Retrieve the Secret Pepper from Streamlit Cloud Secrets
-# If not set in Streamlit, it uses the fallback string
 PEPPER = st.secrets.get("MY_SECRET_PEPPER", "default_fallback_spice_2026")
 
 st.markdown("""
     <style>
     .stApp { background-color: #E6E1F2 !important; }
+    
+    /* Hide default Streamlit labels for a cleaner look */
     div[data-testid="stWidgetLabel"], label { display: none !important; }
 
     /* INPUT BOX CUSTOMIZATION */
@@ -31,9 +32,9 @@ st.markdown("""
         font-weight: bold !important;
     }
 
-    /* THE BUTTONS - Mobile Optimized */
+    /* THE BOLD MOBILE BUTTONS */
     div.stButton > button p {
-        font-size: 42px !important;
+        font-size: 36px !important; 
         font-weight: 800 !important;
         line-height: 1.1 !important;
         margin: 0 !important;
@@ -46,20 +47,22 @@ st.markdown("""
         min-height: 90px !important; 
         height: auto !important;     
         border: none !important;
-        width: 100% !important;
+        width: 100% !important; /* Forces full width on mobile */
         text-transform: uppercase;
         display: flex !important;
         align-items: center !important;
         justify-content: center !important;
         box-shadow: 0px 4px 10px rgba(0,0,0,0.1);
+        margin-bottom: 12px !important;
     }
 
-    /* DESTROY BUTTON Styling */
+    /* DESTROY BUTTON - Slightly smaller text */
     div[data-testid="stVerticalBlock"] > div:last-child .stButton > button p {
-        font-size: 20px !important;
+        font-size: 22px !important;
     }
     div[data-testid="stVerticalBlock"] > div:last-child .stButton > button {
-        min-height: 50px !important;
+        min-height: 60px !important;
+        background-color: #D1C4E9 !important; /* Slightly different shade */
     }
 
     .result-box {
@@ -98,12 +101,8 @@ coord_to_char = {v: k for k, v in char_to_coord.items()}
 EMOJI_MAP = {'1': '🦄', '2': '🍼', '3': '🩷', '4': '🧸', '5': '🎀', '6': '🍓', '7': '🌈', '8': '🌸', '9': '💕', '0': '🫐'}
 
 def get_matrix_elements(key_string):
-    """The 'Pro' Key Derivation with a Secret Pepper"""
     salt = b"sweet_parity_salt_v2" 
-    
-    # Combine user key with the secret Pepper from Streamlit Secrets
     combined_input = key_string + PEPPER
-    
     kdf = PBKDF2HMAC(
         algorithm=hashes.SHA256(),
         length=4, 
@@ -111,11 +110,8 @@ def get_matrix_elements(key_string):
         iterations=100000, 
         backend=default_backend()
     )
-    
     key_bytes = kdf.derive(combined_input.encode())
     a, b, c, d = list(key_bytes)
-    
-    # Deriving the four matrix variables
     return (a % 10 + 2, b % 7 + 1, c % 5 + 1, d % 13 + 2)
 
 def apply_sweet_parity(val_str):
@@ -147,9 +143,9 @@ user_input = st.text_area("Message", height=120, key="chem", placeholder="YOUR M
 
 output_placeholder = st.empty()
 
-col1, col2 = st.columns(2)
-with col1: kiss_btn = st.button("KISS")
-with col2: tell_btn = st.button("TELL")
+# Stacked Buttons for Mobile Clarity
+kiss_btn = st.button("KISS")
+tell_btn = st.button("TELL")
 
 st.button("DESTROY CHEMISTRY", on_click=clear_everything)
 
@@ -167,12 +163,10 @@ if kw and (kiss_btn or tell_btn):
                     nx, ny = (a*x + b*y) % 31, (c*x + d*y) % 31
                     points.append((nx, ny))
             if points:
-                # Header (Always Reversed)
                 hx = "".join(EMOJI_MAP.get(c, c) for c in apply_sweet_parity(str(points[0][0])))
                 hy = "".join(EMOJI_MAP.get(c, c) for c in apply_sweet_parity(str(points[0][1])))
                 header = f"{hx[::-1]},{hy[::-1]}"
                 
-                # Moves with Mirror Rhythm
                 m_list = []
                 for i in range(len(points)-1):
                     dx_v, dy_v = points[i+1][0]-points[i][0], points[i+1][1]-points[i][1]
@@ -218,3 +212,4 @@ if kw and (kiss_btn or tell_btn):
                 output_placeholder.markdown(f'<div class="whisper-text">Cypher Whispers: {"".join(decoded)}</div>', unsafe_allow_html=True)
             except:
                 st.error("Chemistry Error!")
+
