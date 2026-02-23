@@ -32,8 +32,8 @@ st.markdown("""
         font-weight: bold !important;
     }
 
-    /* THE BOLD MOBILE BUTTONS - ULTRA WIDE EDITION */
-    /* This targets the container to ensure it stays full width */
+    /* THE POWER FIX: Forces button containers to be full width on mobile */
+    div[data-testid="stVerticalBlock"] div[data-testid="element-container"],
     div[data-testid="stVerticalBlock"] div[data-testid="element-container"] .stButton,
     div[data-testid="stVerticalBlock"] div[data-testid="element-container"] .stButton button {
         width: 100% !important;
@@ -61,7 +61,7 @@ st.markdown("""
         margin-top: 10px !important;
     }
 
-    /* DESTROY BUTTON - Slightly smaller font but still huge */
+    /* DESTROY BUTTON - Slightly smaller font but still full width */
     div[data-testid="stVerticalBlock"] > div:last-child .stButton > button p {
         font-size: 24px !important;
     }
@@ -107,8 +107,9 @@ coord_to_char = {v: k for k, v in char_to_coord.items()}
 EMOJI_MAP = {'1': '🦄', '2': '🍼', '3': '🩷', '4': '🧸', '5': '🎀', '6': '🍓', '7': '🌈', '8': '🌸', '9': '💕', '0': '🫐'}
 
 def get_matrix_elements(key_string):
+    """The 'Pro' Key Derivation with a Secret Pepper"""
     salt = b"sweet_parity_salt_v2" 
-    combined_input = key_string + PEPPER
+    combined_input = key_string + PEPPER #
     kdf = PBKDF2HMAC(
         algorithm=hashes.SHA256(),
         length=4, 
@@ -116,7 +117,7 @@ def get_matrix_elements(key_string):
         iterations=100000, 
         backend=default_backend()
     )
-    key_bytes = kdf.derive(combined_input.encode())
+    key_bytes = kdf.derive(combined_input.encode()) #
     a, b, c, d = list(key_bytes)
     return (a % 10 + 2, b % 7 + 1, c % 5 + 1, d % 13 + 2)
 
@@ -149,7 +150,7 @@ user_input = st.text_area("Message", height=120, key="chem", placeholder="YOUR M
 
 output_placeholder = st.empty()
 
-# Stacked Buttons for Mobile
+# Stacked Buttons (now targeted by our new CSS fix)
 kiss_btn = st.button("KISS")
 tell_btn = st.button("TELL")
 
@@ -157,7 +158,7 @@ st.button("DESTROY CHEMISTRY", on_click=clear_everything)
 
 # --- 4. PROCESSING ---
 if kw and (kiss_btn or tell_btn):
-    a, b, c, d = get_matrix_elements(kw)
+    a, b, c, d = get_matrix_elements(kw) #
     det_inv = modInverse((a * d - b * c) % 31)
     
     if det_inv:
@@ -218,4 +219,3 @@ if kw and (kiss_btn or tell_btn):
                 output_placeholder.markdown(f'<div class="whisper-text">Cypher Whispers: {"".join(decoded)}</div>', unsafe_allow_html=True)
             except:
                 st.error("Chemistry Error!")
-
