@@ -10,6 +10,10 @@ from cryptography.hazmat.backends import default_backend
 # --- 1. CONFIG & STYLING ---
 st.set_page_config(page_title="Cyfer Pro: Secret Language", layout="centered")
 
+# Retrieve the Secret Pepper from Streamlit Cloud Secrets
+# If not set in Streamlit, it uses the fallback string
+PEPPER = st.secrets.get("MY_SECRET_PEPPER", "default_fallback_spice_2026")
+
 st.markdown("""
     <style>
     .stApp { background-color: #E6E1F2 !important; }
@@ -27,7 +31,7 @@ st.markdown("""
         font-weight: bold !important;
     }
 
-    /* THE "GOLDILOCKS" BUTTONS - Adjusted for Mobile fit */
+    /* THE BUTTONS - Mobile Optimized */
     div.stButton > button p {
         font-size: 42px !important;
         font-weight: 800 !important;
@@ -50,7 +54,7 @@ st.markdown("""
         box-shadow: 0px 4px 10px rgba(0,0,0,0.1);
     }
 
-    /* DESTROY BUTTON */
+    /* DESTROY BUTTON Styling */
     div[data-testid="stVerticalBlock"] > div:last-child .stButton > button p {
         font-size: 20px !important;
     }
@@ -94,8 +98,12 @@ coord_to_char = {v: k for k, v in char_to_coord.items()}
 EMOJI_MAP = {'1': '🦄', '2': '🍼', '3': '🩷', '4': '🧸', '5': '🎀', '6': '🍓', '7': '🌈', '8': '🌸', '9': '💕', '0': '🫐'}
 
 def get_matrix_elements(key_string):
-    """The 'Pro' Key Derivation Function (PBKDF2)"""
+    """The 'Pro' Key Derivation with a Secret Pepper"""
     salt = b"sweet_parity_salt_v2" 
+    
+    # Combine user key with the secret Pepper from Streamlit Secrets
+    combined_input = key_string + PEPPER
+    
     kdf = PBKDF2HMAC(
         algorithm=hashes.SHA256(),
         length=4, 
@@ -103,8 +111,11 @@ def get_matrix_elements(key_string):
         iterations=100000, 
         backend=default_backend()
     )
-    key_bytes = kdf.derive(key_string.encode())
+    
+    key_bytes = kdf.derive(combined_input.encode())
     a, b, c, d = list(key_bytes)
+    
+    # Deriving the four matrix variables
     return (a % 10 + 2, b % 7 + 1, c % 5 + 1, d % 13 + 2)
 
 def apply_sweet_parity(val_str):
@@ -125,22 +136,22 @@ def clear_everything():
     st.session_state.hint = ""
 
 # --- 3. UI LAYOUT ---
-if os.path.exists("CYPHER.png"): st.image("CYPHER.png", width="stretch")
-if os.path.exists("Lock Lips.png"): st.image("Lock Lips.png", width="stretch")
+if os.path.exists("CYPHER.png"): st.image("CYPHER.png", use_container_width=True)
+if os.path.exists("Lock Lips.png"): st.image("Lock Lips.png", use_container_width=True)
 
 kw = st.text_input("Key", type="password", key="lips", placeholder="SECRET KEY").upper().strip()
 hint_text = st.text_input("Hint", key="hint", placeholder="KEY HINT (Optional)")
 
-if os.path.exists("Kiss Chemistry.png"): st.image("Kiss Chemistry.png", width="stretch")
+if os.path.exists("Kiss Chemistry.png"): st.image("Kiss Chemistry.png", use_container_width=True)
 user_input = st.text_area("Message", height=120, key="chem", placeholder="YOUR MESSAGE")
 
 output_placeholder = st.empty()
 
 col1, col2 = st.columns(2)
-with col1: kiss_btn = st.button("KISS", width="stretch")
-with col2: tell_btn = st.button("TELL", width="stretch")
+with col1: kiss_btn = st.button("KISS")
+with col2: tell_btn = st.button("TELL")
 
-st.button("DESTROY CHEMISTRY", width="stretch", on_click=clear_everything)
+st.button("DESTROY CHEMISTRY", on_click=clear_everything)
 
 # --- 4. PROCESSING ---
 if kw and (kiss_btn or tell_btn):
