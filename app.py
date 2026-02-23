@@ -13,6 +13,9 @@ st.set_page_config(page_title="Cyfer Pro: Secret Language", layout="centered")
 # Retrieve the Secret Pepper from Streamlit Cloud Secrets
 PEPPER = st.secrets.get("MY_SECRET_PEPPER", "default_fallback_spice_2026")
 
+# --- DEBUG LINE: Look at the top of your app to see this! ---
+st.write(f"DEBUG: Pepper starts with {PEPPER[:3]}...")
+
 st.markdown("""
     <style>
     .stApp { background-color: #E6E1F2 !important; }
@@ -141,7 +144,6 @@ def clear_everything():
     st.session_state.hint = ""
 
 # --- 3. UI LAYOUT ---
-# REPLACED use_container_width=True WITH width="stretch" TO FIX DEPRECATION
 if os.path.exists("CYPHER.png"): st.image("CYPHER.png", width="stretch")
 if os.path.exists("Lock Lips.png"): st.image("Lock Lips.png", width="stretch")
 
