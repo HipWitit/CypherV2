@@ -150,7 +150,7 @@ user_input = st.text_area("Message", height=120, key="chem", placeholder="YOUR M
 
 output_placeholder = st.empty()
 
-# Stacked Buttons (now targeted by our new CSS fix)
+# Stacked Buttons (now targeted by our new power CSS fix)
 kiss_btn = st.button("KISS")
 tell_btn = st.button("TELL")
 
