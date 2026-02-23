@@ -10,11 +10,13 @@ from cryptography.hazmat.backends import default_backend
 # --- 1. CONFIG & STYLING ---
 st.set_page_config(page_title="Cyfer Pro: Secret Language", layout="centered")
 
-# Retrieve the Secret Pepper from Streamlit Cloud Secrets
-PEPPER = st.secrets.get("MY_SECRET_PEPPER", "default_fallback_spice_2026")
+# --- IMPROVED SECRET RETRIEVAL ---
+# This checks for ALL CAPS, lowercase, or a fallback.
+raw_pepper = st.secrets.get("MY_SECRET_PEPPER") or st.secrets.get("my_secret_pepper") or "default_fallback_spice_2026"
+PEPPER = str(raw_pepper)
 
-# --- DEBUG LINE: Look at the top of your app to see this! ---
-st.write(f"DEBUG: Pepper starts with {PEPPER[:3]}...")
+# This BLUE BOX will tell us if it's working!
+st.info(f"✨ App Status: Pepper begins with **{PEPPER[:3]}**")
 
 st.markdown("""
     <style>
@@ -144,13 +146,13 @@ def clear_everything():
     st.session_state.hint = ""
 
 # --- 3. UI LAYOUT ---
-if os.path.exists("CYPHER.png"): st.image("CYPHER.png", width="stretch")
-if os.path.exists("Lock Lips.png"): st.image("Lock Lips.png", width="stretch")
+if os.path.exists("CYPHER.png"): st.image("CYPHER.png")
+if os.path.exists("Lock Lips.png"): st.image("Lock Lips.png")
 
 kw = st.text_input("Key", type="password", key="lips", placeholder="SECRET KEY").upper().strip()
 hint_text = st.text_input("Hint", key="hint", placeholder="KEY HINT (Optional)")
 
-if os.path.exists("Kiss Chemistry.png"): st.image("Kiss Chemistry.png", width="stretch")
+if os.path.exists("Kiss Chemistry.png"): st.image("Kiss Chemistry.png")
 user_input = st.text_area("Message", height=120, key="chem", placeholder="YOUR MESSAGE")
 
 output_placeholder = st.empty()
