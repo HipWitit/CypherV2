@@ -17,14 +17,14 @@ st.markdown(f"""
     /* Periwinkle Background */
     .stApp {{ background-color: #DBDCFF !important; }}
     
-    /* Ensure page doesn't feel cramped at the bottom */
+    /* Breathing room at bottom */
     .main .block-container {{
         padding-bottom: 150px !important;
     }}
     
     div[data-testid="stWidgetLabel"], label {{ display: none !important; }}
 
-    /* Input Customization */
+    /* Input Box Customization */
     .stTextInput > div > div > input, 
     .stTextArea > div > div > textarea {{
         background-color: #FEE2E9 !important;
@@ -35,7 +35,7 @@ st.markdown(f"""
         font-weight: bold !important;
     }}
 
-    /* FORCE FULL WIDTH BUTTONS */
+    /* RE-STRETCH BUTTONS TO FULL WIDTH */
     .stButton, .stButton > button {{
         width: 100% !important;
         display: block !important;
@@ -45,6 +45,7 @@ st.markdown(f"""
         font-size: 38px !important; 
         font-weight: 800 !important;
         line-height: 1.1 !important;
+        margin: 0 !important;
     }}
 
     div.stButton > button {{
@@ -57,7 +58,7 @@ st.markdown(f"""
         margin-top: 15px !important;
     }}
 
-    /* Specific style for the bottom button */
+    /* Destroy Chemistry Button - Bottom one */
     div[data-testid="stVerticalBlock"] > div:nth-last-child(2) .stButton > button {{
         min-height: 70px !important;
         background-color: #D1C4E9 !important;
@@ -76,50 +77,73 @@ st.markdown(f"""
         font-weight: bold;
     }}
 
-    /* CENTERED FOOTER STYLING */
-    .footer-wrapper {{
+    .whisper-text {{
+        color: #B4A7D6;
+        font-family: "Courier New", Courier, monospace !important;
+        font-weight: bold;
+        font-size: 26px;
+        margin-top: 20px;
+        border-top: 2px dashed #B4A7D6;
+        padding-top: 15px;
+    }}
+
+    /* CENTERED FOOTER SECTION */
+    .footer-container {{
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: center;
         text-align: center;
-        margin-top: 50px;
         width: 100%;
+        margin-top: 40px;
     }}
-
     .created-by {{
         color: #B4A7D6;
         font-family: "Courier New", Courier, monospace;
-        font-size: 24px;
+        font-size: 22px;
         font-weight: bold;
-        letter-spacing: 2px;
+        text-transform: uppercase;
         margin-top: 10px;
+        letter-spacing: 2px;
     }}
     </style>
     """, unsafe_allow_html=True)
 
-# --- 2. ENGINE LOGIC ---
-char_to_coord = {{
+# --- 2. THE PRO ENGINE ---
+char_to_coord = {
     'Q': (2, 25), 'W': (5, 25), 'E': (8, 25), 'R': (11, 25), 'T': (14, 25), 'Y': (17, 25), 'U': (20, 25), 'I': (23, 25), 'O': (26, 25), 'P': (29, 25),
     'A': (3, 20), 'S': (6, 20), 'D': (9, 20), 'F': (12, 20), 'G': (15, 20), 'H': (18, 20), 'J': (21, 20), 'K': (24, 20), 'L': (27, 20),
     'Z': (4, 15), 'X': (7, 15), 'C': (10, 15), 'V': (13, 15), 'B': (16, 15), 'N': (19, 15), 'M': (22, 15),
     '1': (2, 10), '2': (5, 10), '3': (8, 10), '4': (11, 10), '5': (14, 10), '6': (17, 10), '7': (20, 10), '8': (23, 10), '9': (26, 10), '0': (29, 10),
     '!': (5, 5),  ',': (10, 5), '.': (15, 5), ' ': (20, 5), '?': (25, 5)
-}}
-coord_to_char = {{v: k for k, v in char_to_coord.items()}}
-EMOJI_MAP = {{'1': '🦄', '2': '🍼', '3': '🩷', '4': '🧸', '5': '🎀', '6': '🍓', '7': '🌈', '8': '🌸', '9': '💕', '0': '🫐'}}
+}
+coord_to_char = {v: k for k, v in char_to_coord.items()}
+EMOJI_MAP = {'1': '🦄', '2': '🍼', '3': '🩷', '4': '🧸', '5': '🎀', '6': '🍓', '7': '🌈', '8': '🌸', '9': '💕', '0': '🫐'}
 
 def get_matrix_elements(key_string):
     salt = b"sweet_parity_salt_v2" 
     combined_input = key_string + PEPPER 
     kdf = PBKDF2HMAC(algorithm=hashes.SHA256(), length=4, salt=salt, iterations=100000, backend=default_backend())
-    a, b, c, d = list(kdf.derive(combined_input.encode()))
+    key_bytes = kdf.derive(combined_input.encode()) 
+    a, b, c, d = list(key_bytes)
     return (a % 10 + 2, b % 7 + 1, c % 5 + 1, d % 13 + 2)
+
+def apply_sweet_parity(val_str):
+    def replacer(match):
+        digit = match.group(2)
+        candy = '🍭' if int(digit) % 2 == 0 else '🍬'
+        return candy + digit
+    return re.sub(r'(-)(\d)', replacer, val_str)
 
 def modInverse(n, m=31):
     for x in range(1, m):
         if (((n % m) * (x % m)) % m == 1): return x
     return None
+
+def clear_everything():
+    st.session_state.lips = ""
+    st.session_state.chem = ""
+    st.session_state.hint = ""
 
 # --- 3. UI LAYOUT ---
 if os.path.exists("CYPHER.png"): st.image("CYPHER.png")
@@ -136,18 +160,78 @@ output_placeholder = st.empty()
 kiss_btn = st.button("KISS")
 tell_btn = st.button("TELL")
 
-if st.button("DESTROY CHEMISTRY"):
-    st.session_state.lips = ""
-    st.session_state.chem = ""
-    st.session_state.hint = ""
-    st.rerun()
+st.button("DESTROY CHEMISTRY", on_click=clear_everything)
 
-# --- FOOTER SECTION ---
-st.markdown('<div class="footer-wrapper">', unsafe_allow_html=True)
+# The Centered Footer Section
+st.markdown('<div class="footer-container">', unsafe_allow_html=True)
 if os.path.exists("LPB.png"):
-    st.image("LPB.png", width=180) # Centered automatically by the wrapper
+    # Using a container approach for the image to ensure centering
+    col1, col2, col3 = st.columns([1, 2, 1])
+    with col2:
+        st.image("LPB.png", use_container_width=True)
 st.markdown('<div class="created-by">CREATED BY</div>', unsafe_allow_html=True)
 st.markdown('</div>', unsafe_allow_html=True)
 
 # --- 4. PROCESSING ---
-# (Logic remains exactly as before to keep your Chemistry consistent)
+if kw and (kiss_btn or tell_btn):
+    a, b, c, d = get_matrix_elements(kw)
+    det_inv = modInverse((a * d - b * c) % 31)
+    
+    if det_inv:
+        if kiss_btn:
+            points = []
+            for char in user_input.upper():
+                if char in char_to_coord:
+                    x, y = char_to_coord[char]
+                    nx, ny = (a*x + b*y) % 31, (c*x + d*y) % 31
+                    points.append((nx, ny))
+            if points:
+                hx = "".join(EMOJI_MAP.get(c, c) for c in apply_sweet_parity(str(points[0][0])))
+                hy = "".join(EMOJI_MAP.get(c, c) for c in apply_sweet_parity(str(points[0][1])))
+                header = f"{hx[::-1]},{hy[::-1]}"
+                
+                m_list = []
+                for i in range(len(points)-1):
+                    dx_v, dy_v = points[i+1][0]-points[i][0], points[i+1][1]-points[i][1]
+                    dx = "".join(EMOJI_MAP.get(c, c) for c in apply_sweet_parity(str(dx_v)))
+                    dy = "".join(EMOJI_MAP.get(c, c) for c in apply_sweet_parity(str(dy_v)))
+                    
+                    if (i + 1) % 2 == 0: m_list.append(f"({dx[::-1]},{dy[::-1]})")
+                    else: m_list.append(f"({dx},{dy})")
+                
+                res = f"{header} | MOVES: {' '.join(m_list)}"
+                with output_placeholder.container():
+                    st.markdown(f'<div class="result-box">{res}</div>', unsafe_allow_html=True)
+                    share_html = f"""<button onclick="navigator.share({{title:'Secret',text:`{res}\\n\\nHint: {hint_text}`}})" style="background-color:#B4A7D6; color:#FFD4E5; font-weight:bold; border-radius:20px; min-height:80px; width:100%; cursor:pointer; font-size: 28px; border:none; text-transform:uppercase;">SHARE ✨</button>"""
+                    components.html(share_html, height=100)
+
+        if tell_btn:
+            try:
+                clean_in = user_input.split("Hint:")[0].strip()
+                h_part, m_part = clean_in.split("|")
+                rev_map = {v: k for k, v in EMOJI_MAP.items()}
+                
+                def e_to_m(s):
+                    s = "".join(rev_map.get(c, c) for c in s)
+                    return int(s.replace('🍭', '-').replace('🍬', '-'))
+
+                hx_e, hy_e = h_part.strip().split(",")
+                curr_x, curr_y = e_to_m(hx_e[::-1]), e_to_m(hy_e[::-1])
+                
+                inv_a, inv_b = (d * det_inv) % 31, (-b * det_inv) % 31
+                inv_c, inv_d = (-c * det_inv) % 31, (a * det_inv) % 31
+                ux, uy = (inv_a * curr_x + inv_b * curr_y) % 31, (inv_c * curr_x + inv_d * curr_y) % 31
+                decoded = [coord_to_char.get((ux, uy), "?")]
+                
+                moves = re.findall(r"\(([^)]+)\)", m_part)
+                for i, m in enumerate(moves):
+                    dx_e, dy_e = m.split(",")
+                    if (i + 1) % 2 == 0: dx, dy = e_to_m(dx_e[::-1]), e_to_m(dy_e[::-1])
+                    else: dx, dy = e_to_m(dx_e), e_to_m(dy_e)
+                    curr_x, curr_y = curr_x + dx, curr_y + dy
+                    ux, uy = (inv_a * curr_x + inv_b * curr_y) % 31, (inv_c * curr_x + inv_d * curr_y) % 31
+                    decoded.append(coord_to_char.get((ux, uy), "?"))
+                
+                output_placeholder.markdown(f'<div class="whisper-text">Cypher Whispers: {"".join(decoded)}</div>', unsafe_allow_html=True)
+            except:
+                st.error("Chemistry Error!")
