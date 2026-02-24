@@ -11,21 +11,25 @@ from cryptography.hazmat.backends import default_backend
 st.set_page_config(page_title="Cyfer Pro: Secret Language", layout="centered")
 
 # --- IMPROVED SECRET RETRIEVAL ---
-# This checks for ALL CAPS, lowercase, or a fallback.
 raw_pepper = st.secrets.get("MY_SECRET_PEPPER") or st.secrets.get("my_secret_pepper") or "default_fallback_spice_2026"
 PEPPER = str(raw_pepper)
 
-# This BLUE BOX will tell us if it's working!
-st.info(f"✨ App Status: Pepper begins with **{PEPPER[:3]}**")
-
 st.markdown("""
     <style>
+    /* --- THE CLEAN UI ADDITION --- */
+    #MainMenu {visibility: hidden;}
+    footer {visibility: hidden;}
+    header {visibility: hidden;}
+    .block-container {
+        padding-top: 0rem;
+        padding-bottom: 0rem;
+    }
+
+    /* --- YOUR ORIGINAL STYLING --- */
     .stApp { background-color: #E6E1F2 !important; }
     
-    /* Hide default Streamlit labels */
     div[data-testid="stWidgetLabel"], label { display: none !important; }
 
-    /* INPUT BOX CUSTOMIZATION */
     .stTextInput > div > div > input, 
     .stTextArea > div > div > textarea,
     input::placeholder, textarea::placeholder {
@@ -37,7 +41,6 @@ st.markdown("""
         font-weight: bold !important;
     }
 
-    /* THE ULTIMATE BUTTON FIX */
     [data-testid="column"], [data-testid="stVerticalBlock"] > div {
         width: 100% !important;
         flex: 1 1 100% !important;
@@ -69,7 +72,6 @@ st.markdown("""
         margin-top: 15px !important;
     }
 
-    /* DESTROY BUTTON */
     div[data-testid="stVerticalBlock"] > div:last-child .stButton > button p {
         font-size: 24px !important;
     }
@@ -102,6 +104,8 @@ st.markdown("""
     }
     </style>
     """, unsafe_allow_html=True)
+
+st.info(f"✨ App Status: Pepper begins with **{PEPPER[:3]}**")
 
 # --- 2. THE PRO ENGINE ---
 char_to_coord = {
@@ -225,3 +229,4 @@ if kw and (kiss_btn or tell_btn):
                 output_placeholder.markdown(f'<div class="whisper-text">Cypher Whispers: {"".join(decoded)}</div>', unsafe_allow_html=True)
             except:
                 st.error("Chemistry Error!")
+
