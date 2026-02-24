@@ -17,14 +17,14 @@ st.markdown(f"""
     /* Periwinkle Background */
     .stApp {{ background-color: #DBDCFF !important; }}
     
-    /* Massive bottom padding to prevent 'Manage App' overlap */
+    /* Standard Padding */
     .main .block-container {{
-        padding-bottom: 250px !important;
+        padding-bottom: 100px !important;
     }}
     
     div[data-testid="stWidgetLabel"], label {{ display: none !important; }}
 
-    /* Inputs */
+    /* Inputs - Restored Darker Purple Text for visibility */
     .stTextInput > div > div > input, 
     .stTextArea > div > div > textarea {{
         background-color: #FEE2E9 !important;
@@ -35,11 +35,7 @@ st.markdown(f"""
         font-weight: bold !important;
     }}
 
-    /* THE ULTRA FIX FOR BUTTONS: Target every possible container level */
-    [data-testid="stVerticalBlock"] [data-testid="stVerticalBlock"] {{
-        width: 100% !important;
-    }}
-    
+    /* THE BUTTON FIX: Force Full Width and Fixed Stacking */
     .stButton {{
         width: 100% !important;
     }}
@@ -60,42 +56,47 @@ st.markdown(f"""
         font-size: 38px !important; 
         font-weight: 800 !important;
         line-height: 1.1 !important;
-        margin: 0 !important;
     }}
 
-    /* Specific style for 'Destroy Chemistry' to be slightly smaller */
-    div[data-testid="stVerticalBlock"] > div:nth-last-child(3) .stButton > button {{
-        min-height: 70px !important;
-        background-color: #D1C4E9 !important;
-    }}
-    
-    div[data-testid="stVerticalBlock"] > div:nth-last-child(3) .stButton > button p {{
-        font-size: 24px !important;
+    /* Result Box Styling */
+    .result-box {{
+        background-color: #FEE2E9; 
+        color: #B4A7D6;
+        padding: 15px;
+        border-radius: 10px;
+        font-family: "Courier New", Courier, monospace !important;
+        border: 2px solid #B4A7D6;
+        font-weight: bold;
     }}
 
-    /* FOOTER & CREST CENTERING */
-    .footer-centering {{
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
+    /* FOOTER & CREST: Forced Centering with minimal footprint */
+    .footer-container {{
         text-align: center;
         width: 100%;
         margin-top: 50px;
+        padding-bottom: 20px;
     }}
     
+    .footer-image {{
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+        width: 180px;
+    }}
+
     .created-by-text {{
         color: #B4A7D6;
         font-family: "Courier New", Courier, monospace;
-        font-size: 22px;
+        font-size: 20px;
         font-weight: bold;
-        letter-spacing: 3px;
-        margin-top: 15px;
+        text-transform: uppercase;
+        margin-top: 10px;
+        letter-spacing: 2px;
     }}
     </style>
     """, unsafe_allow_html=True)
 
-# --- 2. ENGINE ---
+# --- 2. THE PRO ENGINE ---
 char_to_coord = {
     'Q': (2, 25), 'W': (5, 25), 'E': (8, 25), 'R': (11, 25), 'T': (14, 25), 'Y': (17, 25), 'U': (20, 25), 'I': (23, 25), 'O': (26, 25), 'P': (29, 25),
     'A': (3, 20), 'S': (6, 20), 'D': (9, 20), 'F': (12, 20), 'G': (15, 20), 'H': (18, 20), 'J': (21, 20), 'K': (24, 20), 'L': (27, 20),
@@ -113,7 +114,7 @@ def get_matrix_elements(key_string):
     a, b, c, d = list(kdf.derive(combined_input.encode()))
     return (a % 10 + 2, b % 7 + 1, c % 5 + 1, d % 13 + 2)
 
-# --- 3. UI ---
+# --- 3. UI LAYOUT ---
 if os.path.exists("CYPHER.png"): st.image("CYPHER.png")
 if os.path.exists("Lock Lips.png"): st.image("Lock Lips.png")
 
@@ -123,7 +124,9 @@ hint_text = st.text_input("Hint", key="hint", placeholder="KEY HINT (Optional)")
 if os.path.exists("Kiss Chemistry.png"): st.image("Kiss Chemistry.png")
 user_input = st.text_area("Message", height=120, key="chem", placeholder="YOUR MESSAGE")
 
-# Execution Buttons - Placed in a vertical stack to force stretching
+output_placeholder = st.empty()
+
+# Placing buttons individually for the best mobile stretch
 kiss_btn = st.button("KISS")
 tell_btn = st.button("TELL")
 
@@ -133,13 +136,12 @@ if st.button("DESTROY CHEMISTRY"):
     st.session_state.hint = ""
     st.rerun()
 
-# THE CENTERED FOOTER
-st.markdown('<div class="footer-centering">', unsafe_allow_html=True)
+# FOOTER SECTION - Using absolute center alignment
+st.markdown('<div class="footer-container">', unsafe_allow_html=True)
 if os.path.exists("LPB.png"):
-    # Using a slightly larger fixed width to make it pop
-    st.image("LPB.png", width=220)
+    st.image("LPB.png", width=200) # Centering is handled by the wrapper
 st.markdown('<div class="created-by-text">CREATED BY</div>', unsafe_allow_html=True)
 st.markdown('</div>', unsafe_allow_html=True)
 
-# --- 4. PROCESSING LOGIC ---
-# (Processing logic goes here as before)
+# --- 4. ENGINE LOGIC ---
+# (Rest of your processing logic remains unchanged)
