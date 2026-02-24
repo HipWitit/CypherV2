@@ -10,13 +10,11 @@ from cryptography.hazmat.backends import default_backend
 # --- 1. CONFIG & STYLING ---
 st.set_page_config(page_title="Cyfer Pro: Secret Language", layout="centered")
 
-# --- SECRET RETRIEVAL ---
 raw_pepper = st.secrets.get("MY_SECRET_PEPPER") or st.secrets.get("my_secret_pepper") or "default_fallback_spice_2026"
 PEPPER = str(raw_pepper)
 
 st.markdown(f"""
     <style>
-    /* Periwinkle Background */
     .stApp {{ background-color: #DBDCFF !important; }}
     
     .main .block-container {{
@@ -25,7 +23,6 @@ st.markdown(f"""
     
     div[data-testid="stWidgetLabel"], label {{ display: none !important; }}
 
-    /* Input Styling */
     .stTextInput > div > div > input, 
     .stTextArea > div > div > textarea,
     input::placeholder, textarea::placeholder {{
@@ -37,7 +34,6 @@ st.markdown(f"""
         font-weight: bold !important;
     }}
 
-    /* Button Stretching Fix */
     [data-testid="column"], [data-testid="stVerticalBlock"] > div {{
         width: 100% !important;
         flex: 1 1 100% !important;
@@ -68,7 +64,6 @@ st.markdown(f"""
         margin-top: 15px !important;
     }}
 
-    /* Smaller Destroy Button Style */
     div[data-testid="stVerticalBlock"] > div:last-child .stButton > button p {{
         font-size: 24px !important;
     }}
@@ -78,7 +73,6 @@ st.markdown(f"""
         background-color: #D1C4E9 !important;
     }}
 
-    /* Result Text */
     .result-box {{
         background-color: #FEE2E9; 
         color: #B4A7D6;
@@ -101,8 +95,12 @@ st.markdown(f"""
         padding-top: 15px;
     }}
 
-    /* Centered Footer for Image + Text */
+    /* UPDATED CENTERED FOOTER */
     .custom-footer {{
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
         text-align: center;
         width: 100%;
         margin-top: 60px;
@@ -113,7 +111,7 @@ st.markdown(f"""
         font-family: "Courier New", Courier, monospace;
         font-size: 22px;
         font-weight: bold;
-        margin-top: 10px;
+        margin-top: 15px;
         letter-spacing: 2px;
     }}
     </style>
@@ -172,12 +170,12 @@ tell_btn = st.button("TELL")
 
 st.button("DESTROY CHEMISTRY", on_click=clear_everything)
 
-# --- THE NEW FOOTER ---
+# --- CENTERED FOOTER ---
 st.markdown('<div class="custom-footer">', unsafe_allow_html=True)
 if os.path.exists("LPB.png"):
-    # We use columns inside the footer div to force center the image
-    col1, col2, col3 = st.columns([1, 2, 1])
-    with col2:
+    # Using columns here to ensure the Streamlit image component also stays centered
+    c1, c2, c3 = st.columns([1, 2, 1])
+    with c2:
         st.image("LPB.png", use_container_width=True)
 st.markdown('<div class="footer-text">CREATED BY</div>', unsafe_allow_html=True)
 st.markdown('</div>', unsafe_allow_html=True)
@@ -245,4 +243,3 @@ if kw and (kiss_btn or tell_btn):
                 output_placeholder.markdown(f'<div class="whisper-text">Cypher Whispers: {"".join(decoded)}</div>', unsafe_allow_html=True)
             except:
                 st.error("Chemistry Error!")
-
