@@ -14,50 +14,47 @@ st.set_page_config(page_title="Cyfer Pro: Secret Language", layout="centered")
 raw_pepper = st.secrets.get("MY_SECRET_PEPPER") or st.secrets.get("my_secret_pepper") or "default_fallback_spice_2026"
 PEPPER = str(raw_pepper)
 
-st.markdown("""
+st.markdown(f"""
     <style>
-    .stApp { background-color: #E6E1F2 !important; }
+    /* Updated to your specific Periwinkle Hex */
+    .stApp {{ background-color: #DBDCFF !important; }}
     
-    /* Create a safe zone at the bottom so the "Manage App" menu doesn't cover buttons */
-    .main .block-container {
-        padding-bottom: 150px !important;
-    }
+    .main .block-container {{
+        padding-bottom: 100px !important;
+    }}
     
-    /* Hide default Streamlit labels */
-    div[data-testid="stWidgetLabel"], label { display: none !important; }
+    div[data-testid="stWidgetLabel"], label {{ display: none !important; }}
 
-    /* INPUT BOX CUSTOMIZATION */
     .stTextInput > div > div > input, 
     .stTextArea > div > div > textarea,
-    input::placeholder, textarea::placeholder {
+    input::placeholder, textarea::placeholder {{
         background-color: #FEE2E9 !important;
         color: #B4A7D6 !important; 
         border: 2px solid #B4A7D6 !important;
         font-family: "Courier New", Courier, monospace !important;
         font-size: 18px !important;
         font-weight: bold !important;
-    }
+    }}
 
-    /* THE BUTTON FIX */
-    [data-testid="column"], [data-testid="stVerticalBlock"] > div {
+    [data-testid="column"], [data-testid="stVerticalBlock"] > div {{
         width: 100% !important;
         flex: 1 1 100% !important;
-    }
+    }}
 
-    .stButton, .stButton > button {
+    .stButton, .stButton > button {{
         width: 100% !important;
         display: block !important;
-    }
+    }}
 
-    div.stButton > button p {
+    div.stButton > button p {{
         font-size: 38px !important; 
         font-weight: 800 !important;
         line-height: 1.1 !important;
         margin: 0 !important;
         text-align: center !important;
-    }
+    }}
 
-    div.stButton > button {
+    div.stButton > button {{
         background-color: #B4A7D6 !important; 
         color: #FFD4E5 !important;
         border-radius: 15px !important;
@@ -67,19 +64,18 @@ st.markdown("""
         text-transform: uppercase;
         box-shadow: 0px 4px 12px rgba(0,0,0,0.15);
         margin-top: 15px !important;
-    }
+    }}
 
-    /* DESTROY BUTTON - Lower height and softer color */
-    div[data-testid="stVerticalBlock"] > div:last-child .stButton > button p {
+    div[data-testid="stVerticalBlock"] > div:last-child .stButton > button p {{
         font-size: 24px !important;
-    }
+    }}
     
-    div[data-testid="stVerticalBlock"] > div:last-child .stButton > button {
+    div[data-testid="stVerticalBlock"] > div:last-child .stButton > button {{
         min-height: 70px !important;
         background-color: #D1C4E9 !important;
-    }
+    }}
 
-    .result-box {
+    .result-box {{
         background-color: #FEE2E9; 
         color: #B4A7D6;
         padding: 15px;
@@ -89,9 +85,9 @@ st.markdown("""
         word-wrap: break-word;
         margin-top: 15px;
         font-weight: bold;
-    }
+    }}
 
-    .whisper-text {
+    .whisper-text {{
         color: #B4A7D6;
         font-family: "Courier New", Courier, monospace !important;
         font-weight: bold;
@@ -99,7 +95,17 @@ st.markdown("""
         margin-top: 20px;
         border-top: 2px dashed #B4A7D6;
         padding-top: 15px;
-    }
+    }}
+
+    /* The New Footer Style */
+    .custom-footer {{
+        text-align: center;
+        color: #B4A7D6;
+        font-family: "Courier New", Courier, monospace;
+        font-size: 14px;
+        margin-top: 50px;
+        opacity: 0.8;
+    }}
     </style>
     """, unsafe_allow_html=True)
 
@@ -162,9 +168,8 @@ tell_btn = st.button("TELL")
 
 st.button("DESTROY CHEMISTRY", on_click=clear_everything)
 
-# Move status box to the end
-st.write("---")
-st.info(f"✨ App Status: Pepper begins with **{PEPPER[:3]}**")
+# Custom Footer at the bottom
+st.markdown('<div class="custom-footer">MADE WITH 💖 BY YOU</div>', unsafe_allow_html=True)
 
 # --- 4. PROCESSING ---
 if kw and (kiss_btn or tell_btn):
