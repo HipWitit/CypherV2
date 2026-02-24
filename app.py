@@ -10,26 +10,23 @@ from cryptography.hazmat.backends import default_backend
 # --- 1. CONFIG & STYLING ---
 st.set_page_config(page_title="Cyfer Pro: Secret Language", layout="centered")
 
-# --- IMPROVED SECRET RETRIEVAL ---
+# --- SECRET RETRIEVAL ---
 raw_pepper = st.secrets.get("MY_SECRET_PEPPER") or st.secrets.get("my_secret_pepper") or "default_fallback_spice_2026"
 PEPPER = str(raw_pepper)
 
 st.markdown("""
     <style>
-    /* --- THE CLEAN UI ADDITION --- */
-    #MainMenu {visibility: hidden;}
-    footer {visibility: hidden;}
-    header {visibility: hidden;}
-    .block-container {
-        padding-top: 0rem;
-        padding-bottom: 0rem;
-    }
-
-    /* --- YOUR ORIGINAL STYLING --- */
     .stApp { background-color: #E6E1F2 !important; }
     
+    /* Create a safe zone at the bottom so the "Manage App" menu doesn't cover buttons */
+    .main .block-container {
+        padding-bottom: 150px !important;
+    }
+    
+    /* Hide default Streamlit labels */
     div[data-testid="stWidgetLabel"], label { display: none !important; }
 
+    /* INPUT BOX CUSTOMIZATION */
     .stTextInput > div > div > input, 
     .stTextArea > div > div > textarea,
     input::placeholder, textarea::placeholder {
@@ -41,6 +38,7 @@ st.markdown("""
         font-weight: bold !important;
     }
 
+    /* THE BUTTON FIX */
     [data-testid="column"], [data-testid="stVerticalBlock"] > div {
         width: 100% !important;
         flex: 1 1 100% !important;
@@ -57,7 +55,6 @@ st.markdown("""
         line-height: 1.1 !important;
         margin: 0 !important;
         text-align: center !important;
-        width: 100% !important;
     }
 
     div.stButton > button {
@@ -72,6 +69,7 @@ st.markdown("""
         margin-top: 15px !important;
     }
 
+    /* DESTROY BUTTON - Lower height and softer color */
     div[data-testid="stVerticalBlock"] > div:last-child .stButton > button p {
         font-size: 24px !important;
     }
@@ -104,8 +102,6 @@ st.markdown("""
     }
     </style>
     """, unsafe_allow_html=True)
-
-st.info(f"✨ App Status: Pepper begins with **{PEPPER[:3]}**")
 
 # --- 2. THE PRO ENGINE ---
 char_to_coord = {
@@ -165,6 +161,10 @@ kiss_btn = st.button("KISS")
 tell_btn = st.button("TELL")
 
 st.button("DESTROY CHEMISTRY", on_click=clear_everything)
+
+# Move status box to the end
+st.write("---")
+st.info(f"✨ App Status: Pepper begins with **{PEPPER[:3]}**")
 
 # --- 4. PROCESSING ---
 if kw and (kiss_btn or tell_btn):
@@ -229,4 +229,3 @@ if kw and (kiss_btn or tell_btn):
                 output_placeholder.markdown(f'<div class="whisper-text">Cypher Whispers: {"".join(decoded)}</div>', unsafe_allow_html=True)
             except:
                 st.error("Chemistry Error!")
-
