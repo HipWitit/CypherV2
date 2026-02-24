@@ -16,15 +16,17 @@ PEPPER = str(raw_pepper)
 
 st.markdown(f"""
     <style>
-    /* Updated to your specific Periwinkle Hex */
+    /* Periwinkle Background */
     .stApp {{ background-color: #DBDCFF !important; }}
     
+    /* Buffer for Manage App menu */
     .main .block-container {{
-        padding-bottom: 100px !important;
+        padding-bottom: 120px !important;
     }}
     
     div[data-testid="stWidgetLabel"], label {{ display: none !important; }}
 
+    /* Inputs */
     .stTextInput > div > div > input, 
     .stTextArea > div > div > textarea,
     input::placeholder, textarea::placeholder {{
@@ -36,11 +38,7 @@ st.markdown(f"""
         font-weight: bold !important;
     }}
 
-    [data-testid="column"], [data-testid="stVerticalBlock"] > div {{
-        width: 100% !important;
-        flex: 1 1 100% !important;
-    }}
-
+    /* Buttons */
     .stButton, .stButton > button {{
         width: 100% !important;
         display: block !important;
@@ -50,8 +48,6 @@ st.markdown(f"""
         font-size: 38px !important; 
         font-weight: 800 !important;
         line-height: 1.1 !important;
-        margin: 0 !important;
-        text-align: center !important;
     }}
 
     div.stButton > button {{
@@ -59,20 +55,18 @@ st.markdown(f"""
         color: #FFD4E5 !important;
         border-radius: 15px !important;
         min-height: 100px !important; 
-        height: auto !important;     
         border: none !important;
-        text-transform: uppercase;
         box-shadow: 0px 4px 12px rgba(0,0,0,0.15);
         margin-top: 15px !important;
     }}
 
-    div[data-testid="stVerticalBlock"] > div:last-child .stButton > button p {{
-        font-size: 24px !important;
-    }}
-    
+    /* Destroy Chemistry Button */
     div[data-testid="stVerticalBlock"] > div:last-child .stButton > button {{
         min-height: 70px !important;
         background-color: #D1C4E9 !important;
+    }}
+    div[data-testid="stVerticalBlock"] > div:last-child .stButton > button p {{
+        font-size: 24px !important;
     }}
 
     .result-box {{
@@ -82,8 +76,6 @@ st.markdown(f"""
         border-radius: 10px;
         font-family: "Courier New", Courier, monospace !important;
         border: 2px solid #B4A7D6;
-        word-wrap: break-word;
-        margin-top: 15px;
         font-weight: bold;
     }}
 
@@ -97,14 +89,18 @@ st.markdown(f"""
         padding-top: 15px;
     }}
 
-    /* The New Footer Style */
-    .custom-footer {{
+    /* Footer Branding */
+    .footer-container {{
         text-align: center;
+        margin-top: 60px;
+    }}
+    .created-by {{
         color: #B4A7D6;
         font-family: "Courier New", Courier, monospace;
-        font-size: 14px;
-        margin-top: 50px;
-        opacity: 0.8;
+        font-size: 22px;
+        font-weight: bold;
+        text-transform: uppercase;
+        margin-top: 5px;
     }}
     </style>
     """, unsafe_allow_html=True)
@@ -124,11 +120,8 @@ def get_matrix_elements(key_string):
     salt = b"sweet_parity_salt_v2" 
     combined_input = key_string + PEPPER 
     kdf = PBKDF2HMAC(
-        algorithm=hashes.SHA256(),
-        length=4, 
-        salt=salt,
-        iterations=100000, 
-        backend=default_backend()
+        algorithm=hashes.SHA256(), length=4, salt=salt,
+        iterations=100000, backend=default_backend()
     )
     key_bytes = kdf.derive(combined_input.encode()) 
     a, b, c, d = list(key_bytes)
@@ -168,8 +161,12 @@ tell_btn = st.button("TELL")
 
 st.button("DESTROY CHEMISTRY", on_click=clear_everything)
 
-# Custom Footer at the bottom
-st.markdown('<div class="custom-footer">MADE WITH 💖 BY YOU</div>', unsafe_allow_html=True)
+# Footer with Crest Image
+st.markdown('<div class="footer-container">', unsafe_allow_html=True)
+if os.path.exists("LPB.png"):
+    st.image("LPB.png", width=150) # Adjusted width for "small" look
+st.markdown('<div class="created-by">CREATED BY</div>', unsafe_allow_html=True)
+st.markdown('</div>', unsafe_allow_html=True)
 
 # --- 4. PROCESSING ---
 if kw and (kiss_btn or tell_btn):
