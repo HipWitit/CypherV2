@@ -17,48 +17,46 @@ st.markdown(f"""
     /* Periwinkle Background */
     .stApp {{ background-color: #DBDCFF !important; }}
     
-    /* Standard Padding */
-    .main .block-container {{
-        padding-bottom: 100px !important;
-    }}
-    
+    /* Remove the App Status box and extra space */
     div[data-testid="stWidgetLabel"], label {{ display: none !important; }}
 
-    /* Inputs - Restored Darker Purple Text for visibility */
+    /* INPUTS - FIXED DEEP PURPLE TEXT */
     .stTextInput > div > div > input, 
     .stTextArea > div > div > textarea {{
         background-color: #FEE2E9 !important;
-        color: #B4A7D6 !important; 
+        color: #5D5379 !important; /* Deep Purple for maximum readability */
         border: 2px solid #B4A7D6 !important;
         font-family: "Courier New", Courier, monospace !important;
         font-size: 18px !important;
         font-weight: bold !important;
+        -webkit-text-fill-color: #5D5379 !important; /* Fix for mobile browser ghosting */
     }}
 
-    /* THE BUTTON FIX: Force Full Width and Fixed Stacking */
+    /* BUTTONS - FORCED FULL WIDTH STACK */
     .stButton {{
         width: 100% !important;
+        margin-bottom: 0px !important;
     }}
 
     .stButton > button {{
         width: 100% !important;
-        display: block !important;
         background-color: #B4A7D6 !important; 
         color: #FFD4E5 !important;
         border-radius: 15px !important;
-        min-height: 100px !important; 
+        min-height: 90px !important; 
         border: none !important;
-        box-shadow: 0px 4px 12px rgba(0,0,0,0.15);
-        margin-bottom: 10px !important;
+        box-shadow: 0px 4px 10px rgba(0,0,0,0.1);
+        margin: 5px 0px !important;
     }}
 
     .stButton > button p {{
-        font-size: 38px !important; 
-        font-weight: 800 !important;
+        font-size: 34px !important; 
+        font-weight: 850 !important;
         line-height: 1.1 !important;
+        color: #FFD4E5 !important;
     }}
 
-    /* Result Box Styling */
+    /* RESULT BOX */
     .result-box {{
         background-color: #FEE2E9; 
         color: #B4A7D6;
@@ -67,31 +65,24 @@ st.markdown(f"""
         font-family: "Courier New", Courier, monospace !important;
         border: 2px solid #B4A7D6;
         font-weight: bold;
+        margin-bottom: 20px;
     }}
 
-    /* FOOTER & CREST: Forced Centering with minimal footprint */
-    .footer-container {{
+    /* FOOTER - SIMPLE CENTERING */
+    .custom-footer {{
         text-align: center;
+        margin-top: 40px;
         width: 100%;
-        margin-top: 50px;
-        padding-bottom: 20px;
-    }}
-    
-    .footer-image {{
-        display: block;
-        margin-left: auto;
-        margin-right: auto;
-        width: 180px;
     }}
 
-    .created-by-text {{
+    .created-by {{
         color: #B4A7D6;
         font-family: "Courier New", Courier, monospace;
         font-size: 20px;
         font-weight: bold;
         text-transform: uppercase;
-        margin-top: 10px;
         letter-spacing: 2px;
+        margin-top: 10px;
     }}
     </style>
     """, unsafe_allow_html=True)
@@ -126,22 +117,23 @@ user_input = st.text_area("Message", height=120, key="chem", placeholder="YOUR M
 
 output_placeholder = st.empty()
 
-# Placing buttons individually for the best mobile stretch
+# FORCE VERTICAL STACK FOR BUTTONS
 kiss_btn = st.button("KISS")
 tell_btn = st.button("TELL")
+destroy_btn = st.button("DESTROY CHEMISTRY")
 
-if st.button("DESTROY CHEMISTRY"):
+if destroy_btn:
     st.session_state.lips = ""
     st.session_state.chem = ""
     st.session_state.hint = ""
     st.rerun()
 
-# FOOTER SECTION - Using absolute center alignment
-st.markdown('<div class="footer-container">', unsafe_allow_html=True)
+# THE CLEAN FOOTER
+st.markdown('<div class="custom-footer">', unsafe_allow_html=True)
 if os.path.exists("LPB.png"):
-    st.image("LPB.png", width=200) # Centering is handled by the wrapper
-st.markdown('<div class="created-by-text">CREATED BY</div>', unsafe_allow_html=True)
+    st.image("LPB.png", width=180)
+st.markdown('<div class="created-by">CREATED BY</div>', unsafe_allow_html=True)
 st.markdown('</div>', unsafe_allow_html=True)
 
 # --- 4. ENGINE LOGIC ---
-# (Rest of your processing logic remains unchanged)
+# (Rest of code continues)
